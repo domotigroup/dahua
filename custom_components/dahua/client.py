@@ -269,6 +269,22 @@ class DahuaClient:
             url = "/cgi-bin/configManager.cgi?action=setConfig&" + "&".join(rules_set)
             return await self.get(url, True)
 
+    async def async_set_audio_all_ivs_rules(self, channel: int, enabled: bool):
+        """
+        Sets audio for all IVS rules to enabled or disabled
+        """
+        rules = await self.async_get_ivs_rules()
+        # Supporting up to a max of 11 rules. Just because 11 seems like a high enough number
+        rules_set = []
+        for index in range(10):
+            rule = "table.VideoAnalyseRule[{0}][{1}].Enable".format(channel, index)
+            if rule in rules:
+                rules_set.append("VideoAnalyseRule[{0}][{1}].EventHandler.VoiceEnable={2}".format(channel, index, str(enabled).lower()))
+
+        if len(rules_set) > 0:
+            url = "/cgi-bin/configManager.cgi?action=setConfig&" + "&".join(rules_set)
+            return await self.get(url, True)
+
     async def async_set_ivs_rule(self, channel: int, index: int, enabled: bool):
         """ Sets and IVS rules to enabled or disabled. This also works for Amcrest smart motion detection"""
         url = "/cgi-bin/configManager.cgi?action=setConfig&VideoAnalyseRule[{0}][{1}].Enable={2}".format(
