@@ -93,7 +93,7 @@ Series | 2 Megapixels | 4 Megapixels | 5 Megapixels | 8 Megapixels
 | | IPC-HDBW4239R-ASE |
 | | IPC-HDBW4239RP-ASE |
 | *Panoramic Series* |
-| |  |  | IPC-EW5531-AS | 
+| |  |  | IPC-EW5531-AS |
 ## Other brand cameras
 
 Brand | 2 Megapixels | 4 Megapixels | 5 Megapixels | 8 Megapixels
@@ -230,11 +230,12 @@ Service | Parameters | Description
 `dahua.enable_custom_overlay` | `target`: camera.cam13_main <br /> `channel`: The camera channel, e.g.: 0 <br /> `group`: The group, used to apply multiple of text as an overly, e.g.: 0 <br /> `enabled`: True to enable, False to disable | Enables or disables the custom overlay on the video
 `dahua.set_record_mode` | `target`: camera.cam13_main <br /> `mode`: Auto, On, Off | Sets the record mode. On is always on recording. Off is always off. Auto based on motion settings, etc.
 `dahua.enable_all_ivs_rules` | `target`: camera.cam13_main <br /> `channel`: The camera channel, e.g.: 0 <br /> `enabled`: True to enable all IVS rules, False to disable all IVS rules | Enables or disables all IVS rules
+`dahua.enable_audio_all_ivs_rules` | `target`: camera.cam13_main <br /> `channel`: The camera channel, e.g.: 0 <br /> `enabled`: True to enable audio for all IVS rules, False to disable audio for all IVS rules | Enables or disables audio for all IVS rules
 `dahua.enable_ivs_rule` | `target`: camera.cam13_main <br /> `channel`: The camera channel, e.g.: 0 <br /> `index`: The rule index <br /> enabled`: True to enable the IVS rule, False to disable the IVS rule | Enable or disable an IVS rule
 `dahua.vto_open_door` | `target`: camera.cam13_main <br /> `door_id`: The door ID to open, e.g.: 1 <br /> Opens a door via a VTO
 `dahua.vto_cancel_call` | `target`: camera.cam13_main <br />Cancels a call on a VTO device (Doorbell)
 `dahua.set_video_in_day_night_mode` | `target`: camera.cam13_main <br /> `config_type`: The config type: general, day, night <br /> `mode`: The mode: Auto, Color, BlackWhite. Note Auto is also known as Brightness by Dahua|Set the camera's Day/Night Mode. For example, Color, BlackWhite, or Auto
-`dahua.reboot` | `target`: camera.cam13_main <br />Reboots the device 
+`dahua.reboot` | `target`: camera.cam13_main <br />Reboots the device
 
 
 ## Camera

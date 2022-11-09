@@ -30,6 +30,7 @@ SERVICE_ENABLE_TIME_OVERLay = "enable_time_overlay"
 SERVICE_ENABLE_TEXT_OVERLAY = "enable_text_overlay"
 SERVICE_ENABLE_CUSTOM_OVERLAY = "enable_custom_overlay"
 SERVICE_ENABLE_ALL_IVS_RULES = "enable_all_ivs_rules"
+SERVICE_ENABLE_AUDIO_ALL_IVS_RULES = "enable_audio_all_ivs_rules"
 SERVICE_ENABLE_IVS_RULE = "enable_ivs_rule"
 SERVICE_VTO_OPEN_DOOR = "vto_open_door"
 SERVICE_VTO_CANCEL_CALL = "vto_cancel_call"
@@ -113,6 +114,14 @@ async def async_setup_entry(hass: HomeAssistant, config_entry, async_add_entitie
             vol.Required("enabled", default=True): bool,
         },
         "async_set_enable_all_ivs_rules"
+    )
+
+    platform.async_register_entity_service(
+        SERVICE_ENABLE_AUDIO_ALL_IVS_RULES,
+        {
+            vol.Required("enabled", default=True): bool,
+        },
+        "async_set_enable_audio_all_ivs_rules"
     )
 
     platform.async_register_entity_service(
@@ -325,6 +334,11 @@ class DahuaCamera(DahuaBaseEntity, Camera):
         """ Handles the service call from SERVICE_ENABLE_ALL_IVS_RULES """
         channel = self._coordinator.get_channel()
         await self._coordinator.client.async_set_all_ivs_rules(channel, enabled)
+
+    async def async_set_enable_audio_all_ivs_rules(self, enabled: bool):
+        """ Handles the service call from SERVICE_ENABLE_AUDIO_ALL_IVS_RULES """
+        channel = self._coordinator.get_channel()
+        await self._coordinator.client.async_set_audio_all_ivs_rules(channel, enabled)
 
     async def async_enable_ivs_rule(self, index: int, enabled: bool):
         """ Handles the service call from SERVICE_ENABLE_IVS_RULE """

@@ -330,6 +330,23 @@ enable_all_ivs_rules:
       selector:
         boolean:
 
+enable_audio_all_ivs_rules:
+  name: Enable or Disable audio for All IVS rules
+  description: Enables of disables audio for all IVS rules based on the supplied 'enabled' param
+  target:
+    entity:
+      integration: dahua
+      domain: camera
+  fields:
+    enabled:
+      name: Enabled
+      description: "If true audio for all IVS rules is enabled. If false, all are disabled"
+      example: true
+      required: true
+      default: true
+      selector:
+        boolean:
+
 enable_ivs_rule:
   name: Enable or Disable IVS rule
   description: Enables of disable a single IVS rule based on the supplied 'enabled' param
@@ -385,4 +402,3 @@ vto_cancel_call:
     entity:
       integration: dahua
       domain: camera
-
