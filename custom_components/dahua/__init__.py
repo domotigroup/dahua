@@ -324,8 +324,8 @@ class DahuaDataUpdateCoordinator(DataUpdateCoordinator):
                     data.update(result)
 
             if self.supports_security_light() or self.is_amcrest_flood_light():
-                light_v2 = await self.client.async_get_lighting_v2()
-                if light_v2 is not None:
+                if "DHI-TPC" not in self.model:
+                    light_v2 = await self.client.async_get_lighting_v2()
                     data.update(light_v2)
 
             return data
@@ -517,12 +517,12 @@ class DahuaDataUpdateCoordinator(DataUpdateCoordinator):
         Returns true if this camera has the red/blue flashing security light feature.  For example, the
         IPC-HDW3849HP-AS-PV does https://dahuawiki.com/Template:NameConvention
         """
-        return "-AS-PV" in self.model or self.model == "AD410"
+        return "-AS-PV" in self.model in self.model or self.model == "AD410" or "DHI-TPC" in self.model
 
     def is_doorbell(self) -> bool:
         """ Returns true if this is a doorbell (VTO) """
         m = self.model.upper()
-        return m.startswith("VTO") or m.startswith("DH-VTO") or m.startswith("DHI") or self.is_amcrest_doorbell()
+        return m.startswith("VTO") or m.startswith("DH-VTO") or m.startswith("DHI-VTO") or self.is_amcrest_doorbell()
 
     def is_amcrest_doorbell(self) -> bool:
         """ Returns true if this is an Amcrest doorbell """
