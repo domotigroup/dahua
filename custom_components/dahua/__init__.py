@@ -510,14 +510,14 @@ class DahuaDataUpdateCoordinator(DataUpdateCoordinator):
         Returns true if this camera has a siren. For example, the IPC-HDW3849HP-AS-PV does
         https://dahuawiki.com/Template:NameConvention
         """
-        return "-AS-PV" in self.model or "DHI-TPC" in self.model
+        return "-AS-PV" in self.model or "DHI-TPC" in self.model or "E60-PV" in self.model
 
     def supports_security_light(self) -> bool:
         """
         Returns true if this camera has the red/blue flashing security light feature.  For example, the
         IPC-HDW3849HP-AS-PV does https://dahuawiki.com/Template:NameConvention
         """
-        return "-AS-PV" in self.model in self.model or self.model == "AD410" or "DHI-TPC" in self.model
+        return "-AS-PV" in self.model in self.model or self.model == "AD410" or "DHI-TPC" in self.model or "E60-PV" in self.model
 
     def is_doorbell(self) -> bool:
         """ Returns true if this is a doorbell (VTO) """
