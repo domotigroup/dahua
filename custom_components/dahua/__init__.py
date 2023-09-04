@@ -9,6 +9,9 @@ import time
 
 from datetime import timedelta
 
+from homeassistant.components.tag import async_scan_tag
+import hashlib
+
 from aiohttp import ClientError, ClientResponseError, ClientSession, TCPConnector
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import CALLBACK_TYPE, Config, HomeAssistant
@@ -70,6 +73,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     await coordinator.async_config_entry_first_refresh()
 
     if not coordinator.last_update_success:
+        _LOGGER.warning("dahua async_setup_entry for init, data not ready")
         raise ConfigEntryNotReady
 
     hass.data[DOMAIN][entry.entry_id] = coordinator
@@ -250,7 +254,7 @@ class DahuaDataUpdateCoordinator(DataUpdateCoordinator):
                 _LOGGER.info("Device is a doorbell=%s", is_doorbell)
 
                 is_amcrest_flood_light = self.is_amcrest_flood_light()
-                _LOGGER.info("Device is an Amcrest floodlight=%s",is_amcrest_flood_light)
+                _LOGGER.info("Device is an Amcrest floodlight=%s", is_amcrest_flood_light)
 
                 try:
                     await self.client.async_get_config_lighting(self._channel, self._profile_mode)
@@ -258,7 +262,7 @@ class DahuaDataUpdateCoordinator(DataUpdateCoordinator):
                 except ClientError:
                     self._supports_lighting = False
                     pass
-                _LOGGER.info("Device supports infrared lighting=%s",self.supports_infrared_light())
+                _LOGGER.info("Device supports infrared lighting=%s", self.supports_infrared_light())
 
                 if not is_doorbell:
                     # Start the event listeners for IP cameras
@@ -374,6 +378,14 @@ class DahuaDataUpdateCoordinator(DataUpdateCoordinator):
         # This is the event code, example: VideoMotion, CrossLineDetection, BackKeyLight, PhoneCallDetect, DoorStatus, etc
         code = self.translate_event_code(event)
         event_key = self.get_event_key(code)
+
+        if code == "AccessControl":
+            card_id = event.get("Data", {}).get("CardNo", "")
+            if card_id:
+                card_id_md5 = hashlib.md5(card_id.encode()).hexdigest()
+                asyncio.run_coroutine_threadsafe(
+                    async_scan_tag(self.hass, card_id_md5, self.get_device_name()), self.hass.loop
+                ).result()
 
         listener = self._dahua_event_listeners.get(event_key)
         if listener is not None:
@@ -522,7 +534,8 @@ class DahuaDataUpdateCoordinator(DataUpdateCoordinator):
     def is_doorbell(self) -> bool:
         """ Returns true if this is a doorbell (VTO) """
         m = self.model.upper()
-        return m.startswith("VTO") or m.startswith("DH-VTO") or m.startswith("DHI-VTO") or self.is_amcrest_doorbell()
+        return m.startswith("VTO") or m.startswith("DH-VTO") or (
+                    "NVR" not in m and m.startswith("DHI")) or self.is_amcrest_doorbell()
 
     def is_amcrest_doorbell(self) -> bool:
         """ Returns true if this is an Amcrest doorbell """
@@ -546,7 +559,9 @@ class DahuaDataUpdateCoordinator(DataUpdateCoordinator):
         Returns true if this camera has an illuminator (white light for color cameras).  For example, the
         IPC-HDW3849HP-AS-PV does
         """
-        return not ( self.is_amcrest_doorbell() or self.is_amcrest_flood_light() ) and "table.Lighting_V2[{0}][0][0].Mode".format(self._channel) in self.data
+        return not (
+                    self.is_amcrest_doorbell() or self.is_amcrest_flood_light()) and "table.Lighting_V2[{0}][0][0].Mode".format(
+            self._channel) in self.data
 
     def is_motion_detection_enabled(self) -> bool:
         """ Returns true if motion detection is enabled for the camera """
