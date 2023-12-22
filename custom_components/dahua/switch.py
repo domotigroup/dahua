@@ -4,9 +4,8 @@ from homeassistant.core import HomeAssistant
 from homeassistant.components.switch import SwitchEntity
 from custom_components.dahua import DahuaDataUpdateCoordinator
 
-from .const import DOMAIN, DISARMING_ICON, MOTION_DETECTION_ICON, SIREN_ICON
+from .const import DOMAIN, DISARMING_ICON, MOTION_DETECTION_ICON
 from .entity import DahuaBaseEntity
-from .client import SIREN_TYPE
 
 
 async def async_setup_entry(hass: HomeAssistant, entry, async_add_devices):
@@ -18,9 +17,6 @@ async def async_setup_entry(hass: HomeAssistant, entry, async_add_devices):
         DahuaMotionDetectionBinarySwitch(coordinator, entry),
     ]
 
-    # But only some cams have a siren, very few do actually
-    if coordinator.supports_siren():
-        devices.append(DahuaSirenBinarySwitch(coordinator, entry))
     if coordinator.supports_smart_motion_detection() or coordinator.supports_smart_motion_detection_amcrest():
         devices.append(DahuaSmartMotionDetectionBinarySwitch(coordinator, entry))
 
@@ -160,45 +156,3 @@ class DahuaSmartMotionDetectionBinarySwitch(DahuaBaseEntity, SwitchEntity):
     def is_on(self):
         """ Return true if the switch is on. """
         return self._coordinator.is_smart_motion_detection_enabled()
-
-
-class DahuaSirenBinarySwitch(DahuaBaseEntity, SwitchEntity):
-    """dahua siren switch class. Used to enable or disable camera built in sirens"""
-
-    async def async_turn_on(self, **kwargs):  # pylint: disable=unused-argument
-        """Turn on/enable the camera's siren"""
-        channel = self._coordinator.get_channel()
-        await self._coordinator.client.async_set_coaxial_control_state(channel, SIREN_TYPE, True)
-        await self._coordinator.async_refresh()
-
-    async def async_turn_off(self, **kwargs):  # pylint: disable=unused-argument
-        """Turn off/disable camera siren"""
-        channel = self._coordinator.get_channel()
-        await self._coordinator.client.async_set_coaxial_control_state(channel, SIREN_TYPE, False)
-        await self._coordinator.async_refresh()
-
-    @property
-    def name(self):
-        """Return the name of the switch."""
-        return self._coordinator.get_device_name() + " Siren"
-
-    @property
-    def unique_id(self):
-        """
-        A unique identifier for this entity. Needs to be unique within a platform (ie light.hue). Should not be configurable by the user or be changeable
-        see https://developers.home-assistant.io/docs/entity_registry_index/#unique-id-requirements
-        """
-        return self._coordinator.get_serial_number() + "_siren"
-
-    @property
-    def icon(self):
-        """Return the icon of this switch."""
-        return SIREN_ICON
-
-    @property
-    def is_on(self):
-        """
-        Return true if the siren is on.
-        Value is fetched from api.get_motion_detection_config
-        """
-        return self._coordinator.is_siren_on()

@@ -126,7 +126,7 @@ class DahuaDataUpdateCoordinator(DataUpdateCoordinator):
         self._supports_profile_mode = False
         self._channel = channel
         self._address = address
-        self._max_streams = 3  # 1 main stream + 2 sub-streams by default
+        self._max_streams = 2  # 1 main stream + 2 sub-streams by default
 
         # channel_number is not the channel_index. channel_number is the index + 1.
         # So channel index 0 is channel number 1. Except for some older firmwares where channel
